@@ -1,44 +1,125 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>石の掲示板へ移動しています…</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- ✅ 即時リダイレクト -->
-  <meta http-equiv="refresh" content="0;URL='https://s1122171-cpu.github.io/isi1-test2/'">
-
-  <script>
-    setTimeout(() => {
-      window.location.href = "https://s1122171-cpu.github.io/isi1-test2/";
-    }, 100);
-  </script>
-
-  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      background-color: #f8f5ed;
-      font-family: 'Patrick Hand', 'Hiragino Maru Gothic ProN', sans-serif;
-      color: #3a2d1f;
-      text-align: center;
-      padding-top: 35vh;
-      margin: 0;
-    }
-    .stone {
-      display: inline-block;
-      background-color: #eae4d8;
-      border-radius: 50% 45% 50% 55%;
-      padding: 30px 50px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-    }
-  </style>
-</head>
-
-<body>
-  <div class="stone">
-    <h1>石の掲示板へ移動しています…🪨</h1>
-    <p>（自動で開かない場合は少し待ってください）</p>
-  </div>
-</body>
-</html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>石の掲示板</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+  </head>
+  
+  <body>
+    <div class="wrapper">
+      
+      <!-- ① ヘッダー部分 -->
+      <header class="header">
+        <p class="catchcopy">蹴っても、持ち運んでも◯</p>
+        <h1 class="site-title">石の掲示板</h1>
+      </header>
+      
+      <!-- ② 注意事項（作品の一部として表示） -->
+      <section class="notice">
+        <ul class="notice-list">
+          <li>車や周りの人に注意してください</li>
+          <li>車道に出ないようにしてください</li>
+          <li>点字ブロックの上に置かないでください</li>
+          <li>他人の敷地に置かないでください</li>
+        </ul>
+        <p class="notice-comment">
+          ※本作品に関連して発生した事故・トラブル等について、一切の責任は負いません。
+        </p>
+      </section>
+      
+      <!-- ③ 地図スペース -->
+      <section class="map">
+        <h2 class="section-title">地図</h2>
+        <div class="map-frame">
+          <!-- Google Map や画像を後で挿入予定 -->
+          <p>ここに地図が入ります</p>
+        </div>
+      </section>
+      
+      <!-- ④ 石の記録（投稿一覧） -->
+      <section class="records">
+        <h2 class="section-title">石の記録</h2>
+        <div class="record-list" id="postList">
+          <!-- JSで投稿がここに追加される -->
+        </div>
+      </section>
+      
+      <!-- ⑤ 投稿フォーム -->
+      <section class="post">
+        <h2 class="section-title">あなたの石を置く</h2>
+        <form id="postForm" class="post-form">
+          <div class="form-group">
+            <label for="name">ニックネーム</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="message">ひとことメッセージ</label>
+            <textarea id="message" name="message" rows="3"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="image">画像（任意）</label>
+            <input type="file" id="image" name="image" accept="image/*">
+          </div>
+          
+          <button type="submit" class="submit-button">石を置く 🪨</button>
+        </form>
+      </section>
+      
+      <!-- ⑥ フッター -->
+      <footer class="footer">
+        <p class="footer-text">こちらで集めた情報は大学の制作に使います</p>
+      </footer>
+    </div>
+    
+    <!-- JS（投稿の保存・表示用） -->
+    <script>
+      const form = document.getElementById('postForm');
+      const list = document.getElementById('postList');
+      const posts = JSON.parse(localStorage.getItem('stones') || '[]');
+          posts.forEach(addPostToList);
+          
+          form.addEventListener('submit', e => {
+              e.preventDefault();
+              const name = document.getElementById('name').value.trim();
+              const message = document.getElementById('message').value.trim();
+                const imageInput = document.getElementById('image');
+                  const post = { name, message };
+                  
+                  if (imageInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                      post.image = e.target.result;
+                      saveAndRender(post);
+                    };
+                    reader.readAsDataURL(imageInput.files[0]);
+                  } else {
+                    saveAndRender(post);
+                  }
+                  form.reset();
+              });
+              
+              function saveAndRender(post) {
+                posts.unshift(post);
+                localStorage.setItem('stones', JSON.stringify(posts));
+                    addPostToList(post);
+                  }
+                  
+                  function addPostToList(post) {
+                    const div = document.createElement('div');
+                    div.className = 'record-item';
+                    div.innerHTML = `
+                    <div class="record-name">${post.name || '名無しの石'}</div>
+                    <div class="record-message">${post.message || ''}</div>
+                    ${post.image ? <img src="${post.image}" class="record-image" alt="投稿画像"> : ''}
+                      `;
+                      list.prepend(div);
+                    }
+                  </script>
+                  
+                </body>
+              </html>
